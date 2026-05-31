@@ -1,12 +1,11 @@
 # ============================================================
-# publish_release.py — Tự động đóng gói và tạo Release trên GitHub
-# Version: 1.2.0 (Chạy tại root workspace)
-# Mục đích: Tự động đóng gói và tải các sản phẩm cài đặt lẻ (.exe, .zip, .vsix) lên GitHub Releases
+# publish_release.py — Tự động tạo Release trên GitHub
+# Version: 1.3.0 (Chạy từ thư mục publish)
+# Mục đích: Đọc bản đóng gói từ output/ và tải lên GitHub Releases
 # ============================================================
 import os
 import sys
 import json
-import zipfile
 import requests
 
 # Thiet lap encoding UTF-8 cho console output tren Windows de tranh loi charmap codec
@@ -18,11 +17,12 @@ try:
 except Exception as _e:
     pass
 
-# Xác định thư mục gốc của dự án
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+# Xác định thư mục publish và thư mục gốc của dự án
+PUBLISH_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(PUBLISH_DIR)
 
-TOKEN_FILE = os.path.join(ROOT_DIR, "github_token.txt")
-VERSION_FILE = os.path.join(ROOT_DIR, "version.json")
+TOKEN_FILE = os.path.join(PUBLISH_DIR, "github_token.txt")
+VERSION_FILE = os.path.join(PUBLISH_DIR, "version.json")
 OUTPUT_DIR = os.path.join(ROOT_DIR, "output")
 
 def print_error(func_name, message):
@@ -34,8 +34,8 @@ def get_github_repo():
     """
     try:
         remote_url = ""
-        # 1. Thử đọc từ file github_remote.txt trước
-        remote_file = os.path.join(ROOT_DIR, "github_remote.txt")
+        # 1. Thử đọc từ file github_remote.txt trước trong thư mục publish
+        remote_file = os.path.join(PUBLISH_DIR, "github_remote.txt")
         if os.path.exists(remote_file):
             with open(remote_file, "r", encoding="utf-8") as f:
                 remote_url = f.read().strip()
@@ -72,46 +72,12 @@ def get_github_repo():
         print_error("get_github_repo", f"Lỗi xác định repository: {str(e)}")
         return "mindeskvn/AutoRun_mindesk"
 
-def zip_output_directory(output_dir, zip_file_path):
-    """
-    Nén thư mục output thành tệp ZIP và loại bỏ các file tạm, file cấu hình bảo mật.
-    """
-    try:
-        print(f"[*] Đang thực hiện quét và lọc tệp tin từ: {output_dir}")
-        with zipfile.ZipFile(zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            count = 0
-            for root, dirs, files in os.walk(output_dir):
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    rel_path = os.path.relpath(file_path, output_dir)
-                    
-                    normalized_path = rel_path.replace("\\", "/")
-                    path_parts = normalized_path.split("/")
-                    
-                    # Quy tắc lọc bỏ dữ liệu cá nhân & file phát triển thừa:
-                    if "Data" in path_parts:
-                        continue
-                    if "github_token" in normalized_path or "publish_release" in normalized_path:
-                        continue
-                    if "__pycache__" in path_parts or rel_path.endswith(".pyc") or rel_path.endswith(".pyo"):
-                        continue
-                    if ".git" in path_parts or rel_path == ".gitignore":
-                        continue
-                    
-                    zipf.write(file_path, rel_path)
-                    count += 1
-            print(f"[OK] Đã lọc và đóng gói thành công {count} tệp tin vào {os.path.basename(zip_file_path)}.")
-            return True
-    except Exception as e:
-        print_error("zip_output_directory", f"Lỗi nén tệp tin: {str(e)}")
-        return False
-
 def main():
     try:
         is_non_interactive = "--yes" in sys.argv or "--non-interactive" in sys.argv
         # 1. Đọc thông tin từ version.json
         if not os.path.exists(VERSION_FILE):
-            print_error("main", f"Không tìm thấy file {VERSION_FILE} tại {ROOT_DIR}!")
+            print_error("main", f"Không tìm thấy file {VERSION_FILE} tại {PUBLISH_DIR}!")
             return False
             
         with open(VERSION_FILE, "r", encoding="utf-8") as f:
@@ -171,25 +137,7 @@ def main():
         user_name = user_res.json().get("login")
         print(f"[OK] Xác thực thành công tài khoản: {user_name}")
 
-        # 4. Định nghĩa file ZIP tổng hợp động theo version và thực hiện nén
-        zip_file_name = f"AutoRun_Mindesk_v{version}.zip"
-        zip_file_path = os.path.join(ROOT_DIR, zip_file_name)
-        
-        if not os.path.exists(OUTPUT_DIR):
-            print_error("main", f"Không tìm thấy thư mục 'output' tại {ROOT_DIR}!")
-            return False
-            
-        # Nếu có file ZIP cũ trùng tên thì xóa đi
-        if os.path.exists(zip_file_path):
-            os.remove(zip_file_path)
-            
-        # Thực hiện nén lọc tệp tin
-        zip_success = zip_output_directory(OUTPUT_DIR, zip_file_path)
-        if not zip_success:
-            print_error("main", "Quá trình đóng gói tệp ZIP bị lỗi!")
-            return False
-
-        # 5. Kiểm tra xem Release đã tồn tại chưa
+        # 4. Kiểm tra xem Release đã tồn tại chưa
         print(f"[*] Đang kiểm tra Release {tag_name} trên GitHub...")
         check_release_res = requests.get(f"https://api.github.com/repos/{repo}/releases/tags/{tag_name}", headers=headers)
         
@@ -219,16 +167,15 @@ def main():
                 print("[*] Giữ nguyên Release cũ. Kết thúc.")
                 return True
  
-        # 6. Tạo Release mới
+        # 5. Tạo Release mới
         if release_id is None:
             print(f"[*] Đang tạo Release mới: {tag_name}...")
             
             instructions = (
                 f"\n\n### 📦 Hướng dẫn tải và cài đặt các phiên bản:\n"
-                f"- **Bản Windows (.exe):** Tải và chạy trực tiếp file `antigravity-auto-run-desktop-windows-v{version}.exe` (Bản Portable không cần cài đặt).\n"
-                f"- **Bản Linux (.zip):** Tải file `antigravity-auto-run-desktop-linux-v{version}.zip`, giải nén và chạy file thực thi để sử dụng.\n"
+                f"- **Bản Windows (.exe):** Tải và chạy trực tiếp file `Auto-Run-Desktop-windows-v{version}.exe` (Bản Portable không cần cài đặt).\n"
+                f"- **Bản Linux (.zip):** Tải file `Auto-Run-Desktop-linux-v{version}.zip`, giải nén và chạy file thực thi để sử dụng.\n"
                 f"- **Extension cho IDE (.vsix):** Tải file `antigravity-auto-run-ext-v{version}.vsix`. Trong IDE (Cursor / VS Code), nhấn `Ctrl+Shift+P` -> chọn `Extensions: Install from VSIX...` -> chọn file vừa tải để cài đặt.\n"
-                f"- **Gói tổng hợp (.zip):** Tải file `AutoRun_Mindesk_v{version}.zip` nếu muốn sở hữu toàn bộ các bản cài đặt trên."
             )
             
             release_payload = {
@@ -248,12 +195,8 @@ def main():
             release_id = create_res.json().get("id")
             print(f"[OK] Đã tạo Release mới thành công! (ID: {release_id})")
         
-        # 7. Upload tất cả các file trong thư mục output và file ZIP tổng hợp
+        # 6. Upload tất cả các file trong thư mục output
         assets_to_upload = []
-        
-        # Thêm file ZIP tổng hợp (nếu tồn tại)
-        if os.path.exists(zip_file_path):
-            assets_to_upload.append((zip_file_path, zip_file_name))
         
         # Thêm các file lẻ trong thư mục output
         if os.path.exists(OUTPUT_DIR):
@@ -266,7 +209,7 @@ def main():
         print(f"[*] Danh sách asset chuẩn bị upload lên Release:")
         for _, name in assets_to_upload:
             print(f"  - {name}")
-
+ 
         upload_success = True
         for path_file, name_file in assets_to_upload:
             try:
@@ -302,15 +245,7 @@ def main():
             except Exception as e:
                 print_error("upload_assets", f"Lỗi khi tải tệp {name_file}: {str(e)}")
                 upload_success = False
-
-        # Dọn dẹp tệp zip tổng hợp ở root sau khi tải lên xong
-        if os.path.exists(zip_file_path):
-            try:
-                os.remove(zip_file_path)
-                print(f"[OK] Đã dọn dẹp file ZIP tổng hợp tạm thời: {zip_file_name}")
-            except Exception as e:
-                print(f"[WARNING] Không thể dọn dẹp file ZIP tạm thời: {str(e)}")
-
+ 
         if upload_success:
             print("=" * 60)
             print(f"[OK] ĐÃ TỰ ĐỘNG TẠO RELEASE {tag_name} VÀ UPLOAD TẤT CẢ CÁC BẢN CÀI ĐẶT THÀNH CÔNG!")
@@ -329,5 +264,6 @@ if __name__ == "__main__":
     success = main()
     is_non_interactive = "--yes" in sys.argv or "--non-interactive" in sys.argv
     if not is_non_interactive:
+        import os
         os.system("pause")
     sys.exit(0 if success else 1)

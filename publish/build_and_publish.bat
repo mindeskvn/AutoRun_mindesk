@@ -1,10 +1,11 @@
 @echo off
 title Quy trinh tu dong hoa Build va Publish - AutoRun Mindesk
-cd /d "%~dp0"
+:: Chuyen thu muc lam viec hien tai len thu muc cha (root workspace cua du an)
+cd /d "%~dp0.."
 
 echo ====================================================
 echo * BUOC 1: DONG BO PHIEN BAN (VERSION SYNC) *
-echo ====================================================
+====================================================
 set "GUI_VERSION="
 if not exist "antigravity-auto-run-ext\version.txt" (
     echo [ERROR] Khong tim thay file version.txt trong antigravity-auto-run-ext!
@@ -14,6 +15,10 @@ if not exist "antigravity-auto-run-ext\version.txt" (
 set /p GUI_VERSION=<"antigravity-auto-run-ext\version.txt"
 set GUI_VERSION=%GUI_VERSION: =%
 echo [*] Phat hien phien ban: %GUI_VERSION%
+
+:: Don dep thu muc output truoc khi build bat ky thanh phan nao
+if exist "output" rmdir /s /q "output" >nul 2>&1
+mkdir "output"
 
 :: Cap nhat package.json cua Extension
 echo [*] Dang cap nhat package.json cua Extension...
@@ -33,16 +38,16 @@ if %ERRORLEVEL% neq 0 (
     exit /b 1
 )
 
-:: Cap nhat version.json cua Github Release
-if exist "version.json" (
+:: Cap nhat version.json cua Github Release trong thu muc publish
+if exist "publish\version.json" (
     echo [*] Dang cap nhat version.json...
-    python -c "import json; f=open('version.json', 'r+', encoding='utf-8'); d=json.load(f); d['version']='%GUI_VERSION%'; d['download_url']='https://github.com/mindeskvn/AutoRun_mindesk/releases/download/v%GUI_VERSION%/AutoRun_Mindesk_v%GUI_VERSION%.zip'; f.seek(0); json.dump(d, f, indent=2, ensure_ascii=False); f.truncate(); f.close()" >nul 2>&1
+    python -c "import json; f=open('publish/version.json', 'r+', encoding='utf-8'); d=json.load(f); d['version']='%GUI_VERSION%'; d['download_url']='https://github.com/mindeskvn/AutoRun_mindesk/releases/download/v%GUI_VERSION%/Auto-Run-Desktop-windows-v%GUI_VERSION%.exe'; f.seek(0); json.dump(d, f, indent=2, ensure_ascii=False); f.truncate(); f.close()" >nul 2>&1
 )
 
 echo.
 echo ====================================================
 echo * BUOC 2: DONG GOI EXTENSION (.vsix) *
-echo ====================================================
+===================================================
 :: Xoa file .vsix cu truoc khi build de tranh rac
 if exist "antigravity-auto-run-ext\*.vsix" del /q "antigravity-auto-run-ext\*.vsix"
 if exist "output\*.vsix" del /q "output\*.vsix"
@@ -64,11 +69,9 @@ ren "output\antigravity-auto-run-ext-%GUI_VERSION%.vsix" "antigravity-auto-run-e
 echo.
 echo ====================================================
 echo * BUOC 3: DONG GOI DESKTOP APP (.exe va .tar.gz) *
-echo ====================================================
+====================================================
 :: Tat cac tien trinh electron/desktop app dang chay ngam de tranh lock file
 taskkill /f /im "Antigravity Auto-Run.exe" >nul 2>&1
-if exist "output" rmdir /s /q "output" >nul 2>&1
-mkdir "output"
 
 cd antigravity-auto-run-desktop
 if not exist "node_modules" (
@@ -95,7 +98,7 @@ cd ..
 echo.
 echo ====================================================
 echo * BUOC 4: PUSH CODE LEN GITHUB REPOSITORY *
-echo ====================================================
+====================================================
 
 :: Khoi tao git neu chua co
 if not exist ".git" (
@@ -104,8 +107,8 @@ if not exist ".git" (
 
 :: Reset va thiet lap remote origin tu file/default de tranh loi URL rong hoac sai
 set "REMOTE_URL=https://github.com/mindeskvn/AutoRun_mindesk.git"
-if exist "github_remote.txt" (
-    set /p REMOTE_URL=<github_remote.txt
+if exist "publish\github_remote.txt" (
+    set /p REMOTE_URL=<publish\github_remote.txt
 )
 git remote remove origin >nul 2>&1
 git remote add origin "%REMOTE_URL%" >nul 2>&1
@@ -125,20 +128,18 @@ if %ERRORLEVEL% neq 0 (
 echo.
 echo ====================================================
 echo * BUOC 5: TAO RELEASE VA UPLOAD ASSETS *
-echo ====================================================
-python -u publish_release.py --yes
+====================================================
+python -u publish\publish_release.py --yes
 if %ERRORLEVEL% neq 0 (
     echo [ERROR] Tao Release tren GitHub that bai!
     pause
     exit /b 1
 )
 
-
 echo.
 echo ====================================================
 echo * HOAN THANH TOAN BO QUY TRINH TU DONG HOA! *
-echo ====================================================
+====================================================
 echo Tat ca cac file build da duoc day len GitHub Releases thanh cong!
 echo.
 ping 127.0.0.1 -n 6 >nul
-

@@ -2,7 +2,7 @@
   "name": "antigravity-auto-run-ext",
   "displayName": "Antigravity Auto-Run",
   "description": "Tự động click Run/Accept/Allow/Continue trong Antigravity IDE thông qua CDP.",
-  "version": "2.2.5",
+  "version": "2.2.9",
   "publisher": "antigravity",
   "repository": {
     "type": "git",
