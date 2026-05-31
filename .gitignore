@@ -15,8 +15,8 @@ output/
 *.AppImage
 
 # Local configurations & Sensitive files
-publish/github_token.txt
-publish/github_remote.txt
+publish/
+skill/
 .env
 .gemini/
 
