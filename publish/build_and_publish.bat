@@ -16,6 +16,10 @@ set /p GUI_VERSION=<"antigravity-auto-run-ext\version.txt"
 set GUI_VERSION=%GUI_VERSION: =%
 echo [*] Phat hien phien ban: %GUI_VERSION%
 
+:: Tat cac tien trinh electron/desktop app dang chay ngam de tranh lock file
+taskkill /f /im "Antigravity Auto-Run.exe" >nul 2>&1
+taskkill /f /im "electron.exe" >nul 2>&1
+
 :: Don dep thu muc output truoc khi build bat ky thanh phan nao
 if exist "output" rmdir /s /q "output" >nul 2>&1
 mkdir "output"
@@ -70,9 +74,6 @@ echo.
 echo ====================================================
 echo * BUOC 3: DONG GOI DESKTOP APP (.exe va .tar.gz) *
 ====================================================
-:: Tat cac tien trinh electron/desktop app dang chay ngam de tranh lock file
-taskkill /f /im "Antigravity Auto-Run.exe" >nul 2>&1
-
 cd antigravity-auto-run-desktop
 if not exist "node_modules" (
     echo [*] Dang cai dat dependencies cho Desktop App...
