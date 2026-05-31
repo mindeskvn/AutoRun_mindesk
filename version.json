@@ -1,8 +1,8 @@
 {
   "name": "Antigravity Auto-Run (Multi-Platform)",
-  "version": "2.2.3",
+  "version": "2.2.2",
   "release_date": "2026-05-31",
-  "download_url": "https://github.com/mindeskvn/AutoRun_mindesk/releases/download/v2.2.3/AutoRun_Mindesk_v2.2.3.zip",
+  "download_url": "https://github.com/mindeskvn/AutoRun_mindesk/releases/download/v2.2.2/AutoRun_Mindesk_v2.2.2.zip",
   "changelog": [
     "Cung cấp Extension cài đặt trực tiếp vào IDE để thay thế code Python chạy ngoài.",
     "Bổ sung ứng dụng Desktop (Electron) quản lý và hiển thị stats Auto-Run, hỗ trợ System Tray chạy ngầm.",
