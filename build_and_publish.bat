@@ -128,7 +128,7 @@ echo.
 echo ====================================================
 echo * BUOC 5: TAO RELEASE VA UPLOAD ASSETS *
 echo ====================================================
-python publish_release.py --yes
+python -u publish_release.py --yes
 if %ERRORLEVEL% neq 0 (
     echo [ERROR] Tao Release tren GitHub that bai!
     pause

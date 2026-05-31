@@ -327,5 +327,7 @@ def main():
 
 if __name__ == "__main__":
     success = main()
-    os.system("pause")
+    is_non_interactive = "--yes" in sys.argv or "--non-interactive" in sys.argv
+    if not is_non_interactive:
+        os.system("pause")
     sys.exit(0 if success else 1)
