@@ -1,0 +1,32 @@
+{
+  "name": "antigravity-auto-run-ext",
+  "displayName": "Antigravity Auto-Run",
+  "description": "Tự động click Run/Accept/Allow/Continue trong Antigravity IDE thông qua CDP.",
+  "version": "2.2.2",
+  "publisher": "antigravity",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/antigravity/antigravity-auto-run-ext"
+  },
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "antigravity-auto-run.toggle",
+        "title": "⚡ Toggle Antigravity Auto-Run"
+      }
+    ]
+  },
+  "dependencies": {
+    "ws": "^8.11.0"
+  }
+}

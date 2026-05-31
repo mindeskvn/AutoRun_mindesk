@@ -1,0 +1,31 @@
+# Dependency folders
+node_modules/
+**/node_modules/
+
+# Build outputs
+output/
+**/output/
+*.vsix
+*.zip
+*.exe
+*.tar.gz
+*.dmg
+*.pkg
+*.deb
+*.AppImage
+
+# Local configurations & Sensitive files
+github_token.txt
+github_remote.txt
+.env
+.gemini/
+
+# Project backups
+backup/
+**/backup/
+
+# Editor & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

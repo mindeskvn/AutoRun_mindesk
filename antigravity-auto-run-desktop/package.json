@@ -1,0 +1,44 @@
+{
+  "name": "antigravity-auto-run-desktop",
+  "version": "2.2.2",
+  "description": "Premium Desktop App tự động chạy và quản lý phiên làm việc của Antigravity IDE",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win",
+    "build:linux": "node test-unpack.js && electron-builder --linux",
+    "build:mac": "electron-builder --mac"
+  },
+  "author": "Antigravity",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.11.0"
+  },
+  "devDependencies": {
+    "electron": "^22.0.0",
+    "electron-builder": "^23.6.0"
+  },
+  "build": {
+    "appId": "com.antigravity.autorun",
+    "productName": "Antigravity Auto-Run",
+    "directories": {
+      "output": "../output"
+    },
+    "files": [
+      "**/*",
+      "!node_modules"
+    ],
+    "win": {
+      "target": "portable",
+      "artifactName": "antigravity-auto-run-desktop-windows-v${version}.${ext}"
+    },
+    "linux": {
+      "target": "zip",
+      "artifactName": "antigravity-auto-run-desktop-linux-v${version}.${ext}"
+    },
+    "mac": {
+      "target": "zip",
+      "artifactName": "antigravity-auto-run-desktop-mac-v${version}.${ext}"
+    }
+  }
+}
