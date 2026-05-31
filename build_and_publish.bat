@@ -67,10 +67,8 @@ echo * BUOC 3: DONG GOI DESKTOP APP (.exe va .tar.gz) *
 echo ====================================================
 :: Tat cac tien trinh electron/desktop app dang chay ngam de tranh lock file
 taskkill /f /im "Antigravity Auto-Run.exe" >nul 2>&1
-if exist "output\win-unpacked" rmdir /s /q "output\win-unpacked" >nul 2>&1
-if exist "output\linux-unpacked" rmdir /s /q "output\linux-unpacked" >nul 2>&1
-if exist "output\*.exe" del /q "output\*.exe"
-if exist "output\*.tar.gz" del /q "output\*.tar.gz"
+if exist "output" rmdir /s /q "output" >nul 2>&1
+mkdir "output"
 
 cd antigravity-auto-run-desktop
 if not exist "node_modules" (
@@ -142,5 +140,5 @@ echo * HOAN THANH TOAN BO QUY TRINH TU DONG HOA! *
 echo ====================================================
 echo Tat ca cac file build da duoc day len GitHub Releases thanh cong!
 echo.
-timeout /t 5
+ping 127.0.0.1 -n 6 >nul
 
