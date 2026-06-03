@@ -30,7 +30,9 @@ const CONFIG = {
         autoAccept: true,
         autoAllow: true,
         autoContinue: true,
-        autoAltEnter: true
+        autoAltEnter: true,
+        autoRetry: true,
+        autoSubmit: true
     }
 };
 
@@ -39,10 +41,10 @@ const AUTO_ACCEPT_SCRIPT = `
 (function() {
     'use strict';
     if (typeof window === 'undefined') return;
-    if (window.__autoAcceptFreeLoaded && window.__autoAcceptVersion === 'v2.5') return;
+    if (window.__autoAcceptFreeLoaded && window.__autoAcceptVersion === 'v2.8') return;
     if (window.__autoAcceptStop) { try { window.__autoAcceptStop(); } catch(e){} }
     window.__autoAcceptFreeLoaded = true;
-    window.__autoAcceptVersion = 'v2.5';
+    window.__autoAcceptVersion = 'v2.8';
 
     const log = (msg) => console.log('[AutoRun-Desktop] ' + msg);
     log('Script loaded inside target DOM — MutationObserver active');
@@ -57,7 +59,7 @@ const AUTO_ACCEPT_SCRIPT = `
 
     let pollTimer = null, observer = null, throttleTimer = null;
     let config = { ide: 'Antigravity', isBackgroundMode: false, bannedCommands: [],
-        autoActions: { autoRun: true, autoAccept: true, autoAllow: true, autoContinue: true, autoAltEnter: true } };
+        autoActions: { autoRun: true, autoAccept: true, autoAllow: true, autoContinue: true, autoAltEnter: true, autoRetry: true, autoSubmit: true } };
 
     const getDocuments = (root) => {
         root = root || document; let docs = [root];
@@ -110,7 +112,7 @@ const AUTO_ACCEPT_SCRIPT = `
     const clickEl = (el, reason) => {
         if (!el) return false; reason = reason||'generic';
         try {
-            if (reason !== 'run-prompt' && reason !== 'permission' && isExcludedControl(el)) return false;
+            if (!['run-prompt', 'permission', 'retry', 'submit', 'submit-option'].includes(reason) && isExcludedControl(el)) return false;
             const now = Date.now(), last = Number(el.getAttribute && el.getAttribute('data-aar-clicked-at')||0);
             if (last > 0 && (now-last) < 300) return false;
             const r = el.getBoundingClientRect(); if (r.width===0||r.height===0) return false;
@@ -237,6 +239,22 @@ const AUTO_ACCEPT_SCRIPT = `
                     }
                 }
             }
+            if (config.autoActions.autoRetry) { const allBtns = queryAll('button, [role="button"], a[role="button"]'); for (const b of allBtns) { const t=getActionText(b); if(!t)continue; if(t==='retry'||t.includes('retry')){if(clickEl(b,'retry'))return;} } }
+            if (config.autoActions.autoSubmit) {
+                const allLabels = queryAll('label');
+                for (const l of allLabels) {
+                    const txt = (l.textContent || '').toLowerCase();
+                    if (txt.includes('yes, allow this time') || txt.includes('allow this time')) {
+                        const input = l.querySelector('input[type="radio"]');
+                        if (input && !input.checked) { if (clickEl(l, 'submit-option')) return; }
+                    }
+                }
+                const allBtns = queryAll('button, [role="button"], a[role="button"]');
+                for (const b of allBtns) {
+                    const t = getActionText(b);
+                    if (t === 'submit' || t.includes('submit')) { if (clickEl(b, 'submit')) return; }
+                }
+            }
             if (config.autoActions.autoAccept) { for (const b of btns) { const t=getActionText(b); if(!t)continue; if(!/\\baccept\\b|\\bkeep\\b|\\bapply\\b/i.test(t))continue; if(/\\breject\\b|\\bdeny\\b|\\bcancel\\b/i.test(t))continue; if(clickEl(b,'accept')){const s=window.__autoAcceptFreeState||{};s.fileEdits=(s.fileEdits||0)+1;window.__autoAcceptFreeState=s;return;} } }
         } catch(e){ log('Cycle error: '+(e&&e.message||String(e))); }
     };
@@ -310,19 +328,19 @@ function patchIDE() {
         const marker = '/*__autoRunBuiltinRemoteDebug9000*/';
 
         if (content.includes(marker)) {
-            sendLogToUI('info', 'File main.js của IDE đã được vá trước đó để tự động mở cổng CDP 9000.');
+            sendLogToUI('info', 'Cấu hình kết nối IDE đã được thiết lập trước đó.');
             return true;
         }
 
-        sendLogToUI('warning', 'Đang tiến hành vá file main.js của IDE để mở cổng CDP 9000...');
+        sendLogToUI('warning', 'Đang tiến hành cấu hình thiết lập kết nối cho IDE...');
         const patchCode = `${marker}import { app } from 'electron'; if (app) { app.commandLine.appendSwitch('remote-debugging-port', '9000'); }\n`;
         const newContent = patchCode + content;
 
         fs.writeFileSync(mainJsPath, newContent, 'utf8');
-        sendLogToUI('success', 'Vá file main.js của Antigravity IDE thành công! Vui lòng khởi động lại IDE.');
+        sendLogToUI('success', 'Cấu hình kết nối cho Antigravity IDE thành công! Vui lòng khởi động lại IDE.');
         return true;
     } catch (e) {
-        sendLogToUI('danger', `Lỗi vá file main.js của IDE: ${e.message}`);
+        sendLogToUI('danger', `Lỗi thiết lập cấu hình IDE: ${e.message}`);
         console.error("[Error in patchIDE]: Lỗi vá IDE. Chi tiết:", e.message, e.stack);
         return false;
     }
@@ -565,6 +583,7 @@ function createMainWindow() {
             minWidth: 800,
             minHeight: 600,
             show: false,
+            icon: path.join(__dirname, 'renderer', 'logo.jpeg'),
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js'),
                 contextIsolation: true,
@@ -662,6 +681,15 @@ app.whenReady().then(() => {
         createMainWindow();
         createTray();
 
+        // Tự động kiểm tra bản cập nhật Desktop App từ GitHub khi khởi động
+        setTimeout(() => {
+            try {
+                checkDesktopUpdate();
+            } catch (updateErr) {
+                console.error("[Error in app.whenReady - Update Check]: Lỗi gọi kiểm tra cập nhật. Chi tiết:", updateErr.message, updateErr.stack);
+            }
+        }, 3000); // Đợi 3 giây sau khi khởi động để giao diện sẵn sàng
+
         app.on('activate', () => {
             if (BrowserWindow.getAllWindows().length === 0) {
                 createMainWindow();
@@ -757,3 +785,155 @@ ipcMain.on('request-patch', () => {
         console.error("[Error in ipcMain.request-patch]: Chi tiết:", e.message);
     }
 });
+
+// Tự động kiểm tra cập nhật phiên bản mới của Desktop App từ GitHub
+function checkDesktopUpdate() {
+    try {
+        const https = require('https');
+        const { dialog } = require('electron');
+        const pkg = require('./package.json');
+        
+        const repo = 'mindeskvn/AutoRun_mindesk';
+        const options = {
+            hostname: 'api.github.com',
+            path: `/repos/${repo}/releases/latest`,
+            headers: {
+                'User-Agent': 'Antigravity-AutoRun-Desktop-Updater'
+            }
+        };
+
+        https.get(options, (res) => {
+            let data = '';
+            res.on('data', (chunk) => {
+                data += chunk;
+            });
+            res.on('end', () => {
+                try {
+                    if (res.statusCode !== 200) {
+                        console.error(`[Error in checkDesktopUpdate - API]: GitHub API trả về status code ${res.statusCode}`);
+                        return;
+                    }
+                    const release = JSON.parse(data);
+                    const latestVersion = release.tag_name ? release.tag_name.replace(/^v/, '') : '';
+                    if (!latestVersion) return;
+
+                    const currentVersion = pkg.version;
+                    
+                    const isNewer = (current, latest) => {
+                        const cParts = current.split('.').map(Number);
+                        const lParts = latest.split('.').map(Number);
+                        for (let i = 0; i < 3; i++) {
+                            if (lParts[i] > cParts[i]) return true;
+                            if (lParts[i] < cParts[i]) return false;
+                        }
+                        return false;
+                    };
+
+                    if (isNewer(currentVersion, latestVersion)) {
+                        const setupAsset = release.assets.find(asset => asset.name.includes('setup') && asset.name.endsWith('.exe'));
+                        if (!setupAsset) {
+                            console.log(`[Auto-Run Desktop Update] Phát hiện phiên bản mới v${latestVersion} nhưng không tìm thấy file setup .exe trong release assets.`);
+                            return;
+                        }
+                        
+                        const downloadUrl = setupAsset.browser_download_url;
+                        
+                        if (mainWindow) {
+                            dialog.showMessageBox(mainWindow, {
+                                type: 'question',
+                                buttons: ['Cập nhật ngay', 'Bỏ qua'],
+                                defaultId: 0,
+                                title: 'Cập nhật phiên bản mới',
+                                message: `Đã tìm thấy bản cập nhật mới v${latestVersion} cho Antigravity Auto-Run Desktop App. Bạn có muốn tải về và cài đặt tự động không?`
+                            }).then(result => {
+                                if (result.response === 0) {
+                                    downloadAndInstallDesktop(downloadUrl, latestVersion);
+                                }
+                            }).catch(err => {
+                                console.error('[Error in checkDesktopUpdate - Dialog]: Lỗi hiển thị dialog. Chi tiết:', err.message);
+                            });
+                        }
+                    }
+                } catch (err) {
+                    console.error("[Error in checkDesktopUpdate - Parse]: Lỗi xử lý JSON từ API. Chi tiết:", err.message, err.stack);
+                }
+            });
+        }).on('error', (err) => {
+            console.error("[Error in checkDesktopUpdate - Network]: Lỗi kết nối GitHub API. Chi tiết:", err.message, err.stack);
+        });
+    } catch (e) {
+        console.error("[Error in checkDesktopUpdate]: Lỗi kiểm tra cập nhật. Chi tiết:", e.message, e.stack);
+    }
+}
+
+// Tải xuống file setup .exe và chạy cài đặt đè
+function downloadAndInstallDesktop(downloadUrl, version) {
+    try {
+        const https = require('https');
+        const fs = require('fs');
+        const path = require('path');
+        const os = require('os');
+        const cp = require('child_process');
+        const url = require('url');
+
+        sendLogToUI('info', `Bắt đầu tải bản cập nhật Desktop App v${version}...`);
+
+        const tempExePath = path.join(os.tmpdir(), `Auto-Run-Desktop-setup-${version}.exe`);
+        const fileStream = fs.createWriteStream(tempExePath);
+
+        const download = (fileUrl) => {
+            const parsedUrl = url.parse(fileUrl);
+            const options = {
+                hostname: parsedUrl.hostname,
+                path: parsedUrl.path,
+                headers: {
+                    'User-Agent': 'Antigravity-AutoRun-Desktop-Updater'
+                }
+            };
+
+            https.get(options, (response) => {
+                if (response.statusCode === 301 || response.statusCode === 302) {
+                    download(response.headers.location);
+                    return;
+                }
+
+                if (response.statusCode !== 200) {
+                    fileStream.close();
+                    sendLogToUI('danger', `Tải cập nhật thất bại: Status code ${response.statusCode}`);
+                    return;
+                }
+
+                response.pipe(fileStream);
+
+                fileStream.on('finish', () => {
+                    fileStream.close();
+                    sendLogToUI('success', 'Tải bản cập nhật thành công! Đang tiến hành cài đặt đè...');
+                    
+                    setTimeout(() => {
+                        try {
+                            const installer = cp.spawn(tempExePath, [], {
+                                detached: true,
+                                stdio: 'ignore'
+                            });
+                            installer.unref();
+                            app.quit();
+                        } catch (spawnErr) {
+                            console.error('[Error in downloadAndInstallDesktop - Spawn]: Lỗi khởi chạy file cài đặt. Chi tiết:', spawnErr.message, spawnErr.stack);
+                            sendLogToUI('danger', `Lỗi chạy file cài đặt: ${spawnErr.message}`);
+                        }
+                    }, 1000);
+                });
+            }).on('error', (err) => {
+                fileStream.close();
+                sendLogToUI('danger', `Lỗi tải file cập nhật: ${err.message}`);
+                console.error('[Error in downloadAndInstallDesktop - Network]: Chi tiết:', err.message, err.stack);
+            });
+        };
+
+        download(downloadUrl);
+
+    } catch (e) {
+        sendLogToUI('danger', `Lỗi chuẩn bị tải cập nhật: ${e.message}`);
+        console.error('[Error in downloadAndInstallDesktop]: Chi tiết:', e.message, e.stack);
+    }
+}

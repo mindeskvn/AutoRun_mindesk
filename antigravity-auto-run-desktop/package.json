@@ -1,6 +1,6 @@
 {
   "name": "antigravity-auto-run-desktop",
-  "version": "2.3.3",
+  "version": "2.4.9",
   "description": "Premium Desktop App tự động chạy và quản lý phiên làm việc của Antigravity IDE",
   "main": "main.js",
   "scripts": {
@@ -25,8 +25,16 @@
       "output": "../output"
     },
     "win": {
-      "target": "portable",
-      "artifactName": "Auto-Run-Desktop-windows-v${version}.${ext}"
+      "target": "nsis",
+      "icon": "logo.png",
+      "artifactName": "Auto-Run-Desktop-windows-setup-v${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "Antigravity Auto-Run"
     },
     "linux": {
       "target": "zip",

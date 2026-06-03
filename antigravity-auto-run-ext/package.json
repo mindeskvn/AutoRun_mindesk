@@ -1,12 +1,18 @@
 {
   "name": "antigravity-auto-run-ext",
   "displayName": "Antigravity Auto-Run",
-  "description": "Tự động click Run/Accept/Allow/Continue trong Antigravity IDE thông qua CDP.",
-  "version": "2.3.3",
+  "description": "Tự động click Run/Accept/Allow/Continue trong Antigravity IDE.",
+  "version": "2.4.9",
+  "icon": "logo.jpeg",
   "publisher": "antigravity",
+  "license": "MIT",
+  "homepage": "https://github.com/mindeskvn/AutoRun_mindesk#readme",
+  "bugs": {
+    "url": "https://github.com/mindeskvn/AutoRun_mindesk/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/antigravity/antigravity-auto-run-ext"
+    "url": "https://github.com/mindeskvn/AutoRun_mindesk"
   },
   "engines": {
     "vscode": "^1.74.0"
@@ -23,6 +29,10 @@
       {
         "command": "antigravity-auto-run.toggle",
         "title": "⚡ Toggle Antigravity Auto-Run"
+      },
+      {
+        "command": "antigravity-auto-run.openDashboard",
+        "title": "📊 Antigravity Auto-Run Dashboard"
       }
     ]
   },

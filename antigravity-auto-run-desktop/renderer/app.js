@@ -30,6 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const cfgAutoAccept = document.getElementById('cfg-auto-accept');
         const cfgAutoAllow = document.getElementById('cfg-auto-allow');
         const cfgAutoContinue = document.getElementById('cfg-auto-continue');
+        const cfgAutoRetry = document.getElementById('cfg-auto-retry');
+        const cfgAutoSubmit = document.getElementById('cfg-auto-submit');
         const cfgAutoAltEnter = document.getElementById('cfg-auto-altenter');
         const cfgBannedCommands = document.getElementById('cfg-banned-commands');
 
@@ -133,6 +135,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         autoAccept: cfgAutoAccept.checked,
                         autoAllow: cfgAutoAllow.checked,
                         autoContinue: cfgAutoContinue.checked,
+                        autoRetry: cfgAutoRetry.checked,
+                        autoSubmit: cfgAutoSubmit.checked,
                         autoAltEnter: cfgAutoAltEnter.checked
                     },
                     bannedCommands: bannedList

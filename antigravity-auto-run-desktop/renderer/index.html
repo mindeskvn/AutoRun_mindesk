@@ -17,7 +17,7 @@
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="brand">
-                <i class="fa-solid fa-bolt-lightning brand-icon"></i>
+                <img src="logo.jpeg" alt="Logo" class="brand-logo">
                 <div class="brand-text">
                     <h1>Antigravity</h1>
                     <span>AUTO-RUN CONTROLLER</span>
@@ -39,7 +39,7 @@
             <div class="sidebar-footer">
                 <div class="system-status">
                     <span class="status-indicator online"></span>
-                    <span class="status-text">IDE CDP Port 9000</span>
+                    <span class="status-text">IDE Connection Port 9000</span>
                 </div>
                 <div class="app-version">Version 2.0.0</div>
             </div>
@@ -104,7 +104,7 @@
                             <h3><i class="fa-solid fa-laptop-code"></i> Quản lý IDE</h3>
                         </div>
                         <div class="panel-body">
-                            <p class="description">Tự động cấu hình mở cổng CDP 9000 cho Antigravity IDE cài đặt trên máy tính của bạn để tính năng Auto-Run hoạt động.</p>
+                            <p class="description">Tự động thiết lập cấu hình kết nối cho Antigravity IDE cài đặt trên máy tính của bạn để tính năng Auto-Run hoạt động.</p>
                             <div class="action-buttons-group">
                                 <button class="btn btn-primary" id="btn-patch-ide">
                                     <i class="fa-solid fa-wrench"></i> Vá cấu hình Antigravity IDE
@@ -158,6 +158,18 @@
                             <label class="checkbox-container">
                                 Tự động Click "Continue" (Tiếp tục sinh code)
                                 <input type="checkbox" id="cfg-auto-continue" checked>
+                                <span class="checkmark"></span>
+                            </label>
+                            
+                            <label class="checkbox-container">
+                                Tự động Click "Retry" khi Agent bị lỗi
+                                <input type="checkbox" id="cfg-auto-retry" checked>
+                                <span class="checkmark"></span>
+                            </label>
+                            
+                            <label class="checkbox-container">
+                                Tự động Click "Submit" (Xác nhận sandbox)
+                                <input type="checkbox" id="cfg-auto-submit" checked>
                                 <span class="checkmark"></span>
                             </label>
                             

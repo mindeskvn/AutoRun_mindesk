@@ -24,7 +24,11 @@ if %ERRORLEVEL% neq 0 (
 
 echo.
 echo [2/2] Dang dong goi extension thanh file .vsix...
-call npx -y @vscode/vsce package --no-dependencies --allow-missing-repository
+if not exist "node_modules" (
+    echo [*] Dang cai dat dependencies cho Extension...
+    call npm install
+)
+call npx -y @vscode/vsce package --allow-missing-repository
 
 if %ERRORLEVEL% neq 0 (
     echo.
