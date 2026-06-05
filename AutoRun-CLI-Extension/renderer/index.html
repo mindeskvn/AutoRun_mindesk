@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity CLI Auto-Run Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <img src="logo.jpeg" alt="Logo" class="brand-logo">
+                <div class="brand-text">
+                    <h1>Antigravity</h1>
+                    <span>CLI AUTO-RUN CONTROLLER</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#dashboard" class="nav-item active" id="nav-dashboard">
+                    <i class="fa-solid fa-chart-line"></i> Bảng điều khiển
+                </a>
+                <a href="#config" class="nav-item" id="nav-config">
+                    <i class="fa-solid fa-sliders"></i> Cấu hình hoạt động
+                </a>
+                <a href="#logs" class="nav-item" id="nav-logs">
+                    <i class="fa-solid fa-terminal"></i> Console Log trực tiếp
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="system-status">
+                    <span class="status-indicator online"></span>
+                    <span class="status-text">CLI Connection Port 9000</span>
+                </div>
+                <div class="app-version">Version 2.8.1</div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-bar">
+                <div class="page-title">
+                    <h2 id="current-section-title">Bảng điều khiển</h2>
+                    <p id="current-section-desc">Theo dõi thống kê click và kết nối thời gian thực.</p>
+                </div>
+                
+                <div class="control-toggle-wrapper">
+                    <span class="toggle-label">Auto-Run Status:</span>
+                    <label class="switch">
+                        <input type="checkbox" id="autorun-toggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="section-dashboard" class="content-section active">
+                <div class="stats-grid">
+                    <div class="stat-card clicks">
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-mouse-pointer"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Tổng số Clicks</h3>
+                            <span class="stat-value" id="stat-clicks">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card commands">
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-terminal"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Terminal Run</h3>
+                            <span class="stat-value" id="stat-commands">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card targets">
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-network-wired"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Kết nối CLI</h3>
+                            <span class="stat-value" id="stat-targets">0 Targets</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-layout">
+                    <!-- Quick Controller -->
+                    <div class="panel-card flex-2">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-laptop-code"></i> Quản lý CLI</h3>
+                        </div>
+                        <div class="panel-body">
+                            <p class="description">Tự động thiết lập cấu hình kết nối cho Antigravity CLI cài đặt trên máy tính của bạn để tính năng Auto-Run hoạt động.</p>
+                            <div class="action-buttons-group">
+                                <button class="btn btn-primary" id="btn-patch-ide">
+                                    <i class="fa-solid fa-wrench"></i> Vá cấu hình Antigravity CLI
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistics Info -->
+                    <div class="panel-card flex-1">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-circle-info"></i> Thông tin</h3>
+                        </div>
+                        <div class="panel-body">
+                            <ul class="info-list">
+                                <li><strong>Hệ điều hành:</strong> <span id="info-os">Đang tải...</span></li>
+                                <li><strong>Trạng thái vá:</strong> <span id="info-patched" class="badge bg-success">Đã vá</span></li>
+                                <li><strong>Khay hệ thống:</strong> <span class="badge bg-info">Đang hoạt động</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Config Section -->
+            <section id="section-config" class="content-section">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><i class="fa-solid fa-circle-check"></i> Hành động tự động click</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="checkbox-group-grid">
+                            <label class="checkbox-container">
+                                Tự động Click "Retry" khi Agent bị lỗi
+                                <input type="checkbox" id="cfg-auto-retry" checked>
+                                <span class="checkmark"></span>
+                            </label>
+                            
+                            <label class="checkbox-container">
+                                Tự động Click "Submit" (Xác nhận sandbox)
+                                <input type="checkbox" id="cfg-auto-submit" checked>
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-card margin-top">
+                    <div class="panel-header">
+                        <h3><i class="fa-solid fa-ban"></i> Danh sách lệnh cấm (Banned Commands)</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p class="description">Nếu Terminal xuất hiện các lệnh có chứa các chuỗi sau, Auto-Run sẽ tự động chặn và không click chấp nhận chạy để bảo vệ hệ thống của bạn.</p>
+                        <textarea id="cfg-banned-commands" placeholder="Mỗi lệnh một dòng..." rows="6"></textarea>
+                        
+                        <div class="action-buttons-group align-right">
+                            <button class="btn btn-success" id="btn-save-config">
+                                <i class="fa-solid fa-floppy-disk"></i> Lưu cấu hình
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Logs Section -->
+            <section id="section-logs" class="content-section">
+                <div class="console-wrapper">
+                    <div class="console-header">
+                        <div class="console-buttons">
+                            <span class="c-btn close"></span>
+                            <span class="c-btn minimize"></span>
+                            <span class="c-btn maximize"></span>
+                        </div>
+                        <div class="console-title">antigravity-autorun-terminal</div>
+                        <button class="btn-clear" id="btn-clear-logs">
+                            <i class="fa-solid fa-trash-can"></i> Xóa Logs
+                        </button>
+                    </div>
+                    <div class="console-body" id="console-logs">
+                        <div class="log-line system">
+                            <span class="time">[13:00:00]</span>
+                            <span class="tag tag-system">[HỆ THỐNG]</span>
+                            <span class="msg">Bắt đầu khởi tạo giao diện điều khiển Auto-Run.</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>

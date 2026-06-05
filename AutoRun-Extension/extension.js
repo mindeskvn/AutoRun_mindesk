@@ -295,7 +295,7 @@ function patchMainJs() {
     try {
         const localAppData = process.env.LOCALAPPDATA;
         if (!localAppData) {
-            console.error("[Error in patchMainJs]: Khong tim thay bien moi truong LOCALAPPDATA");
+            console.error("[Error in patchMainJs]: Khong tim thay bien moi truong LOCALAPPDATA tai extension.js của Extension");
             return;
         }
         
@@ -306,18 +306,40 @@ function patchMainJs() {
             return;
         }
 
+        // Đọc package.json của IDE để phát hiện xem nó có phải là ES Module không
+        let isESM = false;
+        try {
+            const packageJsonPath = path.join(path.dirname(mainJsPath), '..', 'package.json');
+            if (fs.existsSync(packageJsonPath)) {
+                const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+                if (pkg && pkg.type === 'module') {
+                    isESM = true;
+                }
+            }
+        } catch (pkgErr) {
+            console.error("[Error in patchMainJs - Read package.json]: Không thể đọc hoặc parse package.json của IDE. Chi tiết:", pkgErr.message, pkgErr);
+        }
+
         let content = fs.readFileSync(mainJsPath, 'utf8');
         const marker = '/*__autoRunBuiltinRemoteDebug9000*/';
         
-        if (content.includes(marker)) {
-            console.log("[Auto-Run Ext] File main.js cua IDE da duoc va truoc do, khong can va lai.");
+        // Tạo bản vá thích hợp cho ESM hoặc CommonJS
+        const patchCode = isESM
+            ? `${marker}import { app } from 'electron'; if (app) { app.commandLine.appendSwitch('remote-debugging-port', '9000'); }\n`
+            : `${marker}const { app } = require('electron'); if (app) { app.commandLine.appendSwitch('remote-debugging-port', '9000'); }\n`;
+        
+        if (content.includes(patchCode)) {
+            console.log("[Auto-Run Ext] File main.js cua IDE da duoc va truoc do voi ban va moi, khong can va lai.");
             return;
         }
 
-        console.log("[Auto-Run Ext] Dang tien hanh va file main.js de mo cong CDP 9000...");
+        console.log(`[Auto-Run Ext] Dang tien hanh va file main.js de mo cong CDP 9000 (${isESM ? 'ES Module' : 'CommonJS'})...`);
         
-        // Đoạn code vá sử dụng ES Module import electron
-        const patchCode = `${marker}import { app } from 'electron'; if (app) { app.commandLine.appendSwitch('remote-debugging-port', '9000'); }\n`;
+        // Loại bỏ các bản vá cũ hoặc lỗi (kể cả bản vá sử dụng import/require cũ)
+        if (content.includes(marker)) {
+            content = content.replace(/\/\*__autoRunBuiltinRemoteDebug9000\*\/.*?\n/g, '');
+        }
+
         const newContent = patchCode + content;
 
         fs.writeFileSync(mainJsPath, newContent, 'utf8');
@@ -325,7 +347,7 @@ function patchMainJs() {
         
         vscode.window.showInformationMessage('⚡ Đã tự động cấu hình kết nối cho Antigravity IDE. Vui lòng khởi động lại IDE để tính năng Auto-Run hoạt động!');
     } catch (e) {
-        console.error("[Error in patchMainJs]: Khong the va file main.js cua IDE. Chi tiet:", e.message, e.stack);
+        console.error("[Error in patchMainJs]: Khong the va file main.js cua IDE tai extension.js của Extension. Chi tiet loi: " + e.message, e);
     }
 }
 

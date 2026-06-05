@@ -1,8 +1,8 @@
 @echo off
-cd /d "%~dp0AutoRun-Desktop"
+cd /d "%~dp0AutoRun-CLI-Extension"
 
 echo ====================================================
-echo * BAT DAU DONG GOI APP DESKTOP ANTIGRAVITY AUTO-RUN*
+echo * BAT DAU DONG GOI CLI DESKTOP ANTIGRAVITY AUTO-RUN*
 echo ====================================================
 echo.
 
@@ -28,7 +28,7 @@ if %ERRORLEVEL% neq 0 (
 )
 
 echo.
-echo [2/4] Dang dong goi ung dung Desktop cho Windows...
+echo [2/4] Dang dong goi ung dung CLI Desktop cho Windows...
 call npm run build:win
 
 if %ERRORLEVEL% neq 0 (
@@ -39,7 +39,7 @@ if %ERRORLEVEL% neq 0 (
 )
 
 echo.
-echo [3/4] Dang dong goi ung dung Desktop cho Linux (zip)...
+echo [3/4] Dang dong goi ung dung CLI Desktop cho Linux (zip)...
 call npm run build:linux
 
 if %ERRORLEVEL% neq 0 (
@@ -53,11 +53,11 @@ echo.
 echo [4/4] Dang kiem tra dong goi cho macOS...
 echo [INFO] Electron-builder chi ho tro dong goi ung dung macOS tren may macOS.
 echo [INFO] Bo qua buoc dong goi macOS tren moi truong Windows hien tai.
-echo [INFO] De build ban Mac, hay mang thu muc 'AutoRun-Desktop' sang may Mac va chay lenh: npm run build:mac
+echo [INFO] De build ban Mac, hay mang thu muc 'AutoRun-CLI-Extension' sang may Mac va chay lenh: npm run build:mac
 
 echo.
 echo ====================================================
-echo * HOAN THANH DONG GOI DESKTOP APP THANH CONG! *
+echo * HOAN THANH DONG GOI CLI DESKTOP APP THANH CONG!  *
 echo ====================================================
 echo File cai dat cho Windows va Linux da duoc tao va chuyen vao thu muc output o root.
 echo.

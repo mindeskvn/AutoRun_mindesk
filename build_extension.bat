@@ -1,5 +1,5 @@
 @echo off
-cd /d "%~dp0antigravity-auto-run-ext"
+cd /d "%~dp0AutoRun-Extension"
 
 echo ====================================================
 echo * BAT DAU DONG GOI EXTENSION ANTIGRAVITY AUTO-RUN *

@@ -1,0 +1,48 @@
+{
+  "name": "antigravity-cli-auto-run-desktop",
+  "version": "2.5.2",
+  "description": "Premium Desktop App tự động chạy và quản lý phiên làm việc của Antigravity CLI",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux",
+    "build:mac": "electron-builder --mac"
+  },
+  "author": "Antigravity",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.11.0"
+  },
+  "devDependencies": {
+    "electron": "^22.0.0",
+    "electron-builder": "^23.6.0"
+  },
+  "build": {
+    "appId": "com.antigravity.cliautorun",
+    "productName": "Antigravity CLI Auto-Run",
+    "directories": {
+      "output": "../output"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "logo.png",
+      "artifactName": "CLI-Auto-Run-Desktop-windows-setup-v${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "Antigravity CLI Auto-Run"
+    },
+    "linux": {
+      "target": "zip",
+      "artifactName": "CLI-Auto-Run-Desktop-linux-v${version}.${ext}"
+    },
+    "mac": {
+      "target": "zip",
+      "artifactName": "CLI-Auto-Run-Desktop-mac-v${version}.${ext}"
+    }
+  }
+}

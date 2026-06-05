@@ -2,7 +2,7 @@
   "name": "antigravity-auto-run-ext",
   "displayName": "Antigravity Auto-Run",
   "description": "Tự động click Run/Accept/Allow/Continue trong Antigravity IDE.",
-  "version": "2.4.9",
+  "version": "2.5.2",
   "icon": "logo.jpeg",
   "publisher": "antigravity",
   "license": "MIT",
