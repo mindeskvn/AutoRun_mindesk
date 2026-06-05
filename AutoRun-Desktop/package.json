@@ -1,6 +1,6 @@
 {
   "name": "antigravity-auto-run-desktop",
-  "version": "2.5.2",
+  "version": "2.5.8",
   "description": "Premium Desktop App tự động chạy và quản lý phiên làm việc của Antigravity IDE",
   "main": "main.js",
   "scripts": {
@@ -22,7 +22,7 @@
     "appId": "com.antigravity.autorun",
     "productName": "Antigravity Auto-Run",
     "directories": {
-      "output": "../output"
+      "output": "../output/desktop"
     },
     "win": {
       "target": "nsis",

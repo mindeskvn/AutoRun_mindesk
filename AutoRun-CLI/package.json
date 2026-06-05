@@ -1,6 +1,6 @@
 {
   "name": "antigravity-cli-auto-run-desktop",
-  "version": "2.5.2",
+  "version": "2.5.8",
   "description": "Premium Desktop App tự động chạy và quản lý phiên làm việc của Antigravity CLI",
   "main": "main.js",
   "scripts": {
@@ -22,7 +22,7 @@
     "appId": "com.antigravity.cliautorun",
     "productName": "Antigravity CLI Auto-Run",
     "directories": {
-      "output": "../output"
+      "output": "../output/cli"
     },
     "win": {
       "target": "nsis",

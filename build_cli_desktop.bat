@@ -1,5 +1,5 @@
 @echo off
-cd /d "%~dp0AutoRun-CLI-Extension"
+cd /d "%~dp0AutoRun-CLI"
 
 echo ====================================================
 echo * BAT DAU DONG GOI CLI DESKTOP ANTIGRAVITY AUTO-RUN*
@@ -53,7 +53,7 @@ echo.
 echo [4/4] Dang kiem tra dong goi cho macOS...
 echo [INFO] Electron-builder chi ho tro dong goi ung dung macOS tren may macOS.
 echo [INFO] Bo qua buoc dong goi macOS tren moi truong Windows hien tai.
-echo [INFO] De build ban Mac, hay mang thu muc 'AutoRun-CLI-Extension' sang may Mac va chay lenh: npm run build:mac
+echo [INFO] De build ban Mac, hay mang thu muc 'AutoRun-CLI' sang may Mac va chay lenh: npm run build:mac
 
 echo.
 echo ====================================================

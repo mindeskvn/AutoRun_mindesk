@@ -1,6 +1,6 @@
 # Antigravity Auto-Run (Phiên bản Đa nền tảng)
 
-Dự án tiện ích tự động hóa và bảo vệ hệ thống thông minh, giúp tối ưu hóa tối đa hiệu suất và mang lại sự an tâm tuyệt đối khi lập trình trên ứng dụng **Antigravity IDE**.
+Dự án tiện ích tự động hóa và bảo vệ hệ thống thông minh, giúp tối ưu hóa tối đa hiệu suất và mang lại sự an tâm tuyệt đối khi lập trình trên ứng dụng **Antigravity IDE** và **Antigravity CLI**.
 
 ---
 
@@ -8,7 +8,7 @@ Dự án tiện ích tự động hóa và bảo vệ hệ thống thông minh, 
 
 *   **Tự động click chấp nhận thông báo:** Tự động phát hiện và bấm các nút xác nhận như "Run", "Accept", "Allow", "Continue" trên IDE. Bạn sẽ không còn bị làm phiền bởi các hộp thoại yêu cầu click thủ công liên tục.
 *   **Chặn câu lệnh phá hoại hệ thống:** Tự động phát hiện, ngăn chặn và cảnh báo ngay lập tức nếu có bất kỳ câu lệnh nguy hiểm nào (như xóa dữ liệu, format ổ đĩa,...) chuẩn bị được thực thi trên máy tính của bạn.
-*   **Tự động cấu hình môi trường IDE:** Tự thiết lập các cài đặt cần thiết ngay khi khởi chạy để đảm bảo tính năng tự động hóa hoạt động ngay lập tức mà không yêu cầu bạn phải cài đặt phức tạp.
+*   **Tự động cấu hình môi trường:** Tự thiết lập các cài đặt cần thiết ngay khi khởi chạy để đảm bảo tính năng tự động hóa hoạt động ngay lập tức mà không yêu cầu bạn phải cài đặt phức tạp.
 *   **Hoạt động linh hoạt song song:** Hỗ trợ hiển thị và điều khiển nhanh dưới dạng một thanh trạng thái nhỏ gọn nằm ngay góc dưới của IDE, hoặc giao diện quản lý chuyên sâu trên Desktop.
 *   **Chạy ẩn thông minh:** Ứng dụng Desktop có thể thu nhỏ xuống góc màn hình và chạy ẩn dưới nền để không gây vướng víu trong quá trình bạn viết code.
 
@@ -25,24 +25,32 @@ Dự án tiện ích tự động hóa và bảo vệ hệ thống thông minh, 
 
 ---
 
-## 3. Cách sử dụng
+## 3. Phân loại các phiên bản và Cách sử dụng
 
-### 3.1. Tải bản cài đặt
-Tải phiên bản mới nhất tại trang [Releases](https://github.com/mindeskvn/AutoRun_mindesk/releases):
-*   Gói nén tổng hợp: `AutoRun_Mindesk_v2.1.9.zip`
-*   Hoặc tải riêng lẻ các bản cài đặt phù hợp với nhu cầu của bạn.
+Dự án được phát triển song song hai nhánh ứng dụng chuyên biệt để phục vụ tối đa nhu cầu của lập trình viên:
 
-### 3.2. Cài đặt tiện ích mở rộng (Extension) cho IDE
-1.  Mở **Antigravity IDE** (hoặc các trình soạn thảo tương thích).
-2.  Nhấn tổ hợp phím `Ctrl + Shift + P` (hoặc `F1`) để mở bảng lệnh.
-3.  Tìm và chọn mục **`Extensions: Install from VSIX...`**.
-4.  Chọn tệp tin tiện ích `antigravity-auto-run-ext-v2.1.9.vsix` vừa tải về để cài đặt.
-5.  Công cụ điều khiển nhanh sẽ hiển thị ở góc dưới cùng bên phải của IDE.
+### 3.1. Dành cho Antigravity IDE (File thực thi: `Antigravity IDE.exe`)
 
-### 3.3. Sử dụng Desktop App
-*   **Windows:** Chạy trực tiếp file `antigravity-auto-run-desktop-windows-v2.1.9.exe` không cần cài đặt.
-*   **Linux:** Giải nén gói `antigravity-auto-run-desktop-linux-v2.1.9.zip` và khởi chạy file thực thi tương ứng.
-*   **macOS:** Tải bản cài đặt dành riêng cho Mac và chạy theo hướng dẫn.
+Nhánh này giúp tự động click các thông báo (Run/Accept/Allow/Continue) và chặn lệnh nguy hiểm ngay trên giao diện soạn thảo IDE.
+
+#### 🔧 Cách cài đặt và sử dụng:
+1. **Extension cho IDE:**
+   * Tải file `antigravity-auto-run-ext-v2.5.5.vsix` tại trang [Releases](https://github.com/mindeskvn/AutoRun_mindesk/releases).
+   * Mở IDE, nhấn `Ctrl + Shift + P` -> chọn **`Extensions: Install from VSIX...`**.
+   * Chọn file `.vsix` vừa tải để cài đặt. Công cụ điều khiển nhanh sẽ hiển thị ở StatusBar của IDE.
+2. **Desktop App điều khiển:**
+   * **Windows:** Tải và chạy trực tiếp file cài đặt `Auto-Run-Desktop-windows-setup-v2.5.5.exe`.
+   * **Linux:** Tải file `Auto-Run-Desktop-linux-v2.5.5.zip`, giải nén và chạy file thực thi để điều khiển.
+
+---
+
+### 3.2. Dành cho Antigravity CLI (File thực thi: `Antigravity.exe`)
+
+Nhánh này giúp tự động trả lời Yes/Allow các xác nhận cấp quyền và tự động gửi lệnh chạy trên Terminal của Antigravity CLI.
+
+#### 🔧 Cách cài đặt và sử dụng:
+* **Windows:** Tải và chạy trực tiếp file cài đặt `CLI-Auto-Run-Desktop-windows-setup-v2.5.5.exe`.
+* **Linux:** Tải file `CLI-Auto-Run-Desktop-linux-v2.5.5.zip`, giải nén và chạy file thực thi để sử dụng.
 
 ---
 

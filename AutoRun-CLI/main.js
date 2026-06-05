@@ -309,9 +309,44 @@ function getIDEPath() {
         if (process.platform === 'win32') {
             const localAppData = process.env.LOCALAPPDATA;
             if (localAppData) {
-                // Kiểm tra đường dẫn bản CLI (được đóng gói dưới dạng app.asar)
-                const cliAsarPath = path.join(localAppData, 'Programs', 'Antigravity', 'resources', 'app.asar');
+                const pathNormal = path.join(localAppData, 'Programs', 'Antigravity');
+                const cliAsarPath = path.join(pathNormal, 'resources', 'app.asar');
+                
                 if (fs.existsSync(cliAsarPath)) {
+                    // Kiem tra xem co phai ban IDE cu < 2.0 cung cài tai Programs/Antigravity khong
+                    const mainJsIDE = path.join(pathNormal, 'resources', 'app', 'out', 'main.js');
+                    if (fs.existsSync(mainJsIDE)) {
+                        // Neu co file main.js cua IDE, kiem tra version trong package.json
+                        const pkgPath = path.join(pathNormal, 'resources', 'app', 'package.json');
+                        if (fs.existsSync(pkgPath)) {
+                            try {
+                                const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+                                const version = pkg.version || "";
+                                // Neu version nho hon 2.0 thi day la IDE cu, khong phai CLI
+                                if (version && !version.startsWith('2.')) {
+                                    console.log(`[AutoRun-CLI] Phat hien Antigravity phien ban ${version} < 2.0 tai Programs/Antigravity, day la ban IDE cu (khong phai CLI).`);
+                                    return null;
+                                }
+                            } catch (err) {
+                                console.error("[Error in getIDEPath - CLI check]: Loi doc package.json. Chi tiet:", err.message);
+                            }
+                        }
+                    } else {
+                        // Neu khong co file main.js cua IDE, thu doc package.json trong app.asar
+                        try {
+                            const asarPkgPath = path.join(cliAsarPath, 'package.json');
+                            if (fs.existsSync(asarPkgPath)) {
+                                const pkg = JSON.parse(fs.readFileSync(asarPkgPath, 'utf8'));
+                                const version = pkg.version || "";
+                                if (version && !version.startsWith('2.')) {
+                                    console.log(`[AutoRun-CLI] Phat hien version trong asar ${version} < 2.0, khong phai CLI.`);
+                                    return null;
+                                }
+                            }
+                        } catch (err) {
+                            // Neu loi doc asar, ta van chap nhan vi khong co main.js cua IDE
+                        }
+                    }
                     return { type: 'asar', path: cliAsarPath };
                 }
             }

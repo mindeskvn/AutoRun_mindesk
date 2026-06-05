@@ -290,6 +290,52 @@ const AUTO_ACCEPT_SCRIPT = `
 })();
 `;
 
+// Xác định đường dẫn file main.js của Antigravity IDE
+function getIDEPath() {
+    try {
+        if (process.platform === 'win32') {
+            const localAppData = process.env.LOCALAPPDATA;
+            if (localAppData) {
+                const pathIDE = path.join(localAppData, 'Programs', 'Antigravity IDE');
+                const pathNormal = path.join(localAppData, 'Programs', 'Antigravity');
+
+                // 1. Kiem tra thu muc Antigravity IDE truoc (Uu tien so 1)
+                const mainJsIDE = path.join(pathIDE, 'resources', 'app', 'out', 'main.js');
+                if (fs.existsSync(mainJsIDE)) {
+                    return mainJsIDE;
+                }
+
+                // 2. Kiem tra thu muc Antigravity (Fallback danh cho ban IDE cu < 2.0)
+                const mainJsNormal = path.join(pathNormal, 'resources', 'app', 'out', 'main.js');
+                if (fs.existsSync(mainJsNormal)) {
+                    const pkgPath = path.join(pathNormal, 'resources', 'app', 'package.json');
+                    if (fs.existsSync(pkgPath)) {
+                        try {
+                            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+                            const version = pkg.version || "";
+                            // Neu version tu 2.0 tro len tai Programs/Antigravity thi day la ban CLI, khong phai IDE
+                            if (version.startsWith('2.')) {
+                                console.log(`[Auto-Run Ext] Phat hien Antigravity phien ban ${version} >= 2.0 tai Programs/Antigravity, day la ban CLI, khong phai IDE.`);
+                                return null;
+                            }
+                        } catch (err) {
+                            console.error("[Error in getIDEPath - Read package.json]: Loi kiem tra version IDE. Chi tiet:", err.message);
+                        }
+                    }
+                    return mainJsNormal;
+                }
+            }
+        } else if (process.platform === 'darwin') {
+            return '/Applications/Antigravity IDE.app/Contents/Resources/app/out/main.js';
+        } else if (process.platform === 'linux') {
+            return '/usr/share/antigravity-ide/resources/app/out/main.js';
+        }
+    } catch (e) {
+        console.error("[Error in getIDEPath]: Loi xac dinh duong dan IDE. Chi tiet:", e.message);
+    }
+    return null;
+}
+
 // Tự động kiểm tra và vá file main.js của Antigravity IDE để tự động mở cổng CDP 9000
 function patchMainJs() {
     try {
@@ -299,9 +345,9 @@ function patchMainJs() {
             return;
         }
         
-        const mainJsPath = path.join(localAppData, 'Programs', 'Antigravity IDE', 'resources', 'app', 'out', 'main.js');
+        const mainJsPath = getIDEPath();
         
-        if (!fs.existsSync(mainJsPath)) {
+        if (!mainJsPath || !fs.existsSync(mainJsPath)) {
             console.log(`[Auto-Run Ext] File main.js cua IDE khong ton tai tai: ${mainJsPath} (Co the dang chay trong moi truong development)`);
             return;
         }
